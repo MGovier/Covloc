@@ -9,6 +9,7 @@ covertMap.functions = function() {
   function pageLoaded() {
     $('.location-search').submit(enterSearch);
     $('#draw-map').click(drawView);
+    $('#elevation-map').click(elevationView);
     $('.left-menu').hide();
   }
 
@@ -24,11 +25,11 @@ covertMap.functions = function() {
     covertMap.map = new google.maps.Map(document.getElementById('map-view'), {
       center: {lat: -34.397, lng: 150.644},
       zoom: 8,
-      mapTypeId: 'terrain'
+      mapTypeId: 'hybrid'
     });
   };
 
-  function drawView () {
+  function drawView() {
       covertMap.map.addListener('click', function(e) {
         alert(e.computeArea());
       });
@@ -64,6 +65,37 @@ covertMap.functions = function() {
         }
 
       });
+  }
+
+  function elevationView() {
+    var elevator = new google.maps.ElevationService;
+    var infowindow = new google.maps.InfoWindow({map: covertMap.map});
+    covertMap.map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+
+    covertMap.map.addListener('click', function(event) {
+      displayLocationElevation(event.latLng, elevator, infowindow);
+    });
+
+    function displayLocationElevation(location, elevator, infowindow) {
+      // Initiate the location request
+      elevator.getElevationForLocations({
+        'locations': [location]
+      }, function(results, status) {
+        infowindow.setPosition(location);
+        if (status === google.maps.ElevationStatus.OK) {
+          // Retrieve the first result
+          if (results[0]) {
+            // Open the infowindow indicating the elevation at the clicked position.
+            infowindow.setContent('The elevation at this point <br>is ' +
+                results[0].elevation + ' meters.');
+          } else {
+            infowindow.setContent('No results found');
+          }
+        } else {
+          infowindow.setContent('Elevation service failed due to: ' + status);
+        }
+      });
+    }
   }
 
   return {
