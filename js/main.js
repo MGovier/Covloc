@@ -68,7 +68,7 @@ covertMap.functions = function() {
   }
 
   function elevationView() {
-    var elevator = new google.maps.ElevationService;
+    var elevator = new google.maps.ElevationService();
     var infowindow = new google.maps.InfoWindow({map: covertMap.map});
     covertMap.map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
 
