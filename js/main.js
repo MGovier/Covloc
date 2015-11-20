@@ -62,7 +62,7 @@ covertMap.functions = function() {
     var drawingManager = new google.maps.drawing.DrawingManager();
     
     covertMap.map.addListener('click', function(e) {
-      alert(e.computeArea());
+      alert(e.getPosition());
     });
 
     $('.left-menu').show();
