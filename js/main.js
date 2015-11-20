@@ -13,6 +13,7 @@ covertMap.functions = function() {
     $('#draw-map').click(drawView);
     $('#elevation-map').click(elevationView);
     $('.left-menu').hide();
+    $('#pick-location').addClass('active');
   }
 
   var enterSearch = function (evt) {
@@ -49,11 +50,15 @@ covertMap.functions = function() {
     google.maps.event.clearListeners(covertMap.map);
     covertMap.map.setMapTypeId(google.maps.MapTypeId.HYBRID);
     $('.left-menu').hide();
+    $('#pick-location').removeClass('active');
+    $('#draw-map').removeClass('active');
+    $('#elevation-map').removeClass('active');
   }
 
 
   function drawView() {
     clearState();
+    $('#draw-map').addClass('active');
     var drawingManager = new google.maps.drawing.DrawingManager();
     
     covertMap.map.addListener('click', function(e) {
@@ -93,6 +98,7 @@ covertMap.functions = function() {
 
   function elevationView() {
     clearState();
+    $('#elevation-map').addClass('active');
     var elevator = new google.maps.ElevationService();
     var infowindow = new google.maps.InfoWindow({map: covertMap.map});
     covertMap.map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
