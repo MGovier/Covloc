@@ -6,6 +6,8 @@ covertMap.embedAPI = 'AIzaSyCExq39ql2QOxjS90djLcDdUaOCFFA56Ns';
 
 covertMap.functions = function() {
 
+  var geocoder;
+
   function pageLoaded() {
     $('.location-search').submit(enterSearch);
     $('#draw-map').click(drawView);
@@ -16,65 +18,90 @@ covertMap.functions = function() {
   var enterSearch = function (evt) {
     evt.preventDefault();
     var searchTerm = evt.currentTarget[0].value;
-    $('body').append('<script async defer ' +
-      'src="https://maps.googleapis.com/maps/api/js?key=' + covertMap.embedAPI + '&callback=covertMap.functions.initMap&libraries=drawing,geometry">' +
-      '</script>');
+    findLocation(searchTerm);
   };
 
   var initMap = function() {
     covertMap.map = new google.maps.Map(document.getElementById('map-view'), {
-      center: {lat: -34.397, lng: 150.644},
-      zoom: 8,
+      center: {lat: 0, lng: 0},
+      zoom: 2,
       mapTypeId: 'hybrid'
     });
   };
 
-  function drawView() {
-      covertMap.map.addListener('click', function(e) {
-        alert(e.getPosition());
-      });
-
-      var drawingManager = new google.maps.drawing.DrawingManager();
-
-      $('.left-menu').show();
-
-      $('.left-menu-item').click(function() {
-        var index = $( ".left-menu-item" ).index( this );
-        
-        // Menu item classes
-        var draw = $('.left-menu-item:eq(0)');
-        var select = $('.left-menu-item:eq(1)');
-
-        // If draw was selected
-        if (index === 0) {
-          draw.toggleClass('menu-item-selected');
-          select.toggleClass('menu-item-selected', false);
-
-          // Add draw control to map
-          drawingManager.setMap(covertMap.map);
+  function findLocation(search) {
+    geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'address': search}, function(results, status) {
+      if (status === google.maps.GeocoderStatus.OK) {
+        if (results[0]) {
+          covertMap.map.setCenter(results[0].geometry.location);
+          covertMap.map.setZoom(10);
         } else {
-          select.toggleClass('menu-item-selected');
-          draw.toggleClass('menu-item-selected', false);
-
-          // Remove draw control from map
-          drawingManager.setMap(null);
+          window.alert('No results found');
         }
+      } else {
+        window.alert('Geocoder failed due to: ' + status);
+      }
+    });
+  }
 
-        if (!draw.hasClass('menu-item-selected')) {
-          drawingManager.setMap(null);
-        }
+  function clearState() {
+    google.maps.event.clearListeners(covertMap.map);
+    covertMap.map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+    $('.left-menu').hide();
+  }
 
-      });
+
+  function drawView() {
+    clearState();
+    var drawingManager = new google.maps.drawing.DrawingManager();
+    
+    covertMap.map.addListener('click', function(e) {
+      alert(e.computeArea());
+    });
+
+    $('.left-menu').show();
+
+    $('.left-menu-item').click(function() {
+      var index = $( ".left-menu-item" ).index( this );
+      
+      // Menu item classes
+      var draw = $('.left-menu-item:eq(0)');
+      var select = $('.left-menu-item:eq(1)');
+
+      // If draw was selected
+      if (index === 0) {
+        draw.toggleClass('menu-item-selected');
+        select.toggleClass('menu-item-selected', false);
+
+        // Add draw control to map
+        drawingManager.setMap(covertMap.map);
+      } else {
+        select.toggleClass('menu-item-selected');
+        draw.toggleClass('menu-item-selected', false);
+
+        // Remove draw control from map
+        drawingManager.setMap(null);
+      }
+
+      if (!draw.hasClass('menu-item-selected')) {
+        drawingManager.setMap(null);
+      }
+
+    });
   }
 
   function elevationView() {
+    clearState();
     var elevator = new google.maps.ElevationService();
     var infowindow = new google.maps.InfoWindow({map: covertMap.map});
     covertMap.map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
 
-    covertMap.map.addListener('click', function(event) {
+    var updateInfo = function (event) {
       displayLocationElevation(event.latLng, elevator, infowindow);
-    });
+    }
+
+    covertMap.map.addListener('click', updateInfo);
 
     function displayLocationElevation(location, elevator, infowindow) {
       // Initiate the location request
