@@ -85,6 +85,12 @@ body {
   margin-top: 0;
 }
 
+/* Search radius toggle */
+.radiusToggle {
+  float:right;
+  margin-bottom: 20px;
+}
+
 #map-view {
   width: 90em;
   height: 50em;

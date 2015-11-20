@@ -13,6 +13,8 @@ covertMap.functions = function() {
     $('#draw-map').click(drawView);
     $('#elevation-map').click(elevationView);
     $('.left-menu').hide();
+    $('.radiusDropdown > li').click(updateChosenRadius);
+    $('#searchRadius').keydown( function(e) { if (e.which == 13) { setRadius(); } });
   }
 
   var enterSearch = function (evt) {
@@ -29,6 +31,7 @@ covertMap.functions = function() {
     });
   };
 
+  var searchCenter;
   function findLocation(search) {
     geocoder = new google.maps.Geocoder();
     geocoder.geocode({ 'address': search}, function(results, status) {
@@ -36,6 +39,8 @@ covertMap.functions = function() {
         if (results[0]) {
           covertMap.map.setCenter(results[0].geometry.location);
           covertMap.map.setZoom(10);
+          searchCenter = results[0].geometry.location;
+          drawCircle();
         } else {
           window.alert('No results found');
         }
@@ -45,10 +50,62 @@ covertMap.functions = function() {
     });
   }
 
+  var circle;
+  function drawCircle() { 
+
+      circle = new google.maps.Circle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        map: covertMap.map,
+        center: searchCenter,
+        radius: 1000
+      }); 
+
+      // Place default radius in input box (1000m)
+      document.getElementById('searchRadius').value = 1000;
+  }
+
   function clearState() {
     google.maps.event.clearListeners(covertMap.map);
     covertMap.map.setMapTypeId(google.maps.MapTypeId.HYBRID);
     $('.left-menu').hide();
+  }
+
+  function updateChosenRadius() {
+    $('.searchRadiusBtn').html($(this).text() + ' <span class="caret"></span>');
+
+    // Set radius of circle
+    setRadius();
+  }
+
+  function setRadius() {
+    var unit = $('.searchRadiusBtn').text();
+    var value = document.getElementById('searchRadius').value;
+    
+
+    if (value != null && circle != null) {
+      // Update current circle
+      circle.setMap(null);
+      var radius = parseInt(getRadius(value, unit));
+      circle.radius = radius;
+      circle.setMap(covertMap.map);
+    }
+  }
+
+  function getRadius(value, unit) {
+    // Standard value is in metres, so any other unit must be converted to metres
+    var radius = 0;
+
+    if (unit.trim() == 'Metres') {
+      return value;
+    }
+    else if (unit.trim() == 'Miles') {
+      return value * 1609.34;
+    }
+
+    //return null;
   }
 
 
