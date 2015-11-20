@@ -31,7 +31,7 @@ covertMap.functions = function() {
 
   function drawView() {
       covertMap.map.addListener('click', function(e) {
-        alert(e.computeArea());
+        alert(e.getPosition());
       });
 
       var drawingManager = new google.maps.drawing.DrawingManager();
