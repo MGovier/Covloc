@@ -49,12 +49,26 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">Map Viewer</h1>
-          <div class="left-menu">
-            <div class="left-menu-item">
-              <span class="fa fa-pencil fa-4x"></span><br>
-            </div>
-            <div class="left-menu-item">
-              <span class="fa fa-hand-o-up fa-4x"></span><br>
+          <div class="col-md-3 radiusToggle">
+            Search Radius: 
+            <div class="input-group">
+              <input type="text" class="form-control" aria-label="..." id="searchRadius" />
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle searchRadiusBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Metres <span class="caret"></span></button>
+                <ul class="dropdown-menu dropdown-menu-right radiusDropdown">
+                  <li><a href="#">Metres</a></li>
+                  <li><a href="#">Miles</a></li>
+                </ul>
+              </div><!-- /btn-group -->
+            </div><!-- /input-group -->
+          </div><!-- /.col-md-3 -->
+            <div class="left-menu">
+              <div class="left-menu-item">
+                <span class="fa fa-pencil fa-4x"></span><br>
+              </div>
+              <div class="left-menu-item">
+                <span class="fa fa-hand-o-up fa-4x"></span><br>
+              </div>
             </div>
           </div>
           <div id="map-view"></div>
