@@ -270,10 +270,8 @@ covertMap.functions = function() {
     }
 
     console.log('The money: ' + collectionOfElevations);
-
-    setTimeout(function() {
-      return collectionOfElevations;
-    }, 4000);
+    
+    return collectionOfElevations;
     
   }
 
