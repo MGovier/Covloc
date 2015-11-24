@@ -10,22 +10,16 @@ covertMap.functions = function() {
     $('.location-search').submit(enterSearch);
     $('#draw-map').click(drawView);
     $('#elevation-map').click(elevationView);
-<<<<<<< Updated upstream:client/js/main.js
-=======
     $('#find-SAM').click(calcSAMSite);
->>>>>>> Stashed changes:js/main.js
     $('.left-menu').hide();
     $('#pick-location').addClass('active');
     $('#pick-location').click(function() {
       location.reload();
     });
     $('.radiusDropdown > li').click(updateChosenRadius);
-<<<<<<< Updated upstream:client/js/main.js
     $('#searchRadius').keydown( function(e) { if (e.which == 13) { setRadius(); } });
     getAlgorithms();
-=======
     $('#searchRadius').keyup(setRadius);
->>>>>>> Stashed changes:js/main.js
   }
 
   var enterSearch = function (evt) {
