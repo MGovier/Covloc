@@ -26,6 +26,7 @@ covertMap.functions = function() {
     evt.preventDefault();
     var searchTerm = evt.currentTarget[0].value;
     findLocation(searchTerm);
+    covertMap.map.setZoom(13);
   };
 
   var initMap = function() {
@@ -34,7 +35,16 @@ covertMap.functions = function() {
       zoom: 2,
       mapTypeId: 'hybrid'
     });
+
+    google.maps.event.addListener(covertMap.map, 'zoom_changed', function() {
+      //console.log(covertMap.map.getZoom());
+      var minZoomLevel = 13;
+     if (covertMap.map.getZoom() < minZoomLevel) covertMap.map.setZoom(minZoomLevel);
+   });
+
   };
+
+
 
   var searchCenter;
   function findLocation(search) {
@@ -70,6 +80,9 @@ covertMap.functions = function() {
 
       // Place default radius in input box (1000m)
       document.getElementById('searchRadius').value = 1000;
+
+      // Limit Zooming
+
   }
 
   function clearState() {
