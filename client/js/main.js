@@ -2,8 +2,6 @@
 
 var covertMap = covertMap || {};
 
-covertMap.embedAPI = 'AIzaSyCExq39ql2QOxjS90djLcDdUaOCFFA56Ns';
-
 covertMap.functions = function() {
 
   var geocoder;
@@ -12,7 +10,6 @@ covertMap.functions = function() {
     $('.location-search').submit(enterSearch);
     $('#draw-map').click(drawView);
     $('#elevation-map').click(elevationView);
-    $('#find-SAM').click(SAMView);
     $('.left-menu').hide();
     $('#pick-location').addClass('active');
     $('#pick-location').click(function() {
@@ -20,6 +17,7 @@ covertMap.functions = function() {
     });
     $('.radiusDropdown > li').click(updateChosenRadius);
     $('#searchRadius').keydown( function(e) { if (e.which == 13) { setRadius(); } });
+    getAlgorithms();
   }
 
   var enterSearch = function (evt) {
@@ -192,11 +190,28 @@ covertMap.functions = function() {
     }
   }
 
-  function SAMView(evt) {
-    clearState();
-    $('#find-SAM').addClass('active');
-    evt.preventDefault();
-    // Execute API code.
+  function getAlgorithms() {
+    $.get('api/1/algorithms')
+      .done((data) => {
+        buildMenu(data);
+      })
+      .fail(() => {
+        alert('API Fail');
+      });
+  }
+
+  function buildMenu (algorithmData) {
+    covertMap.algorithms = {};
+    for (var algo in algorithmData) {
+      if (algorithmData.hasOwnProperty(algo)) {
+        var obj = algorithmData[algo];
+        $('.algo-menu').append('<li id="' + obj.name + '"><a href="#">' + obj.description + '</a></li>');
+        $.getScript(obj.file);
+        $('.algo-menu').on('click', '#' + obj.name, (evt) => {
+          covertMap.algorithms[evt.currentTarget.id].run();
+        });
+      }
+    } 
   }
 
   return {

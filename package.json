@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/MGovier/Covloc#readme",
   "dependencies": {
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "watchr": "^2.4.13"
   }
 }
