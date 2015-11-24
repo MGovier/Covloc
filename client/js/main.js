@@ -193,7 +193,7 @@ covertMap.functions = function() {
   }
 
   function getAlgorithms() {
-    $.get('api/1/algorithms')
+    $.get('http://localhost:8080/api/1/algorithms')
       .done((data) => {
         buildMenu(data);
       })

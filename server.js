@@ -43,6 +43,12 @@ watchr.watch({
   }
 });
 
+CovLocGlobals.app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 CovLocGlobals.app.use(express.static('algorithms'));
 CovLocGlobals.app.use(express.static('client'));
 
