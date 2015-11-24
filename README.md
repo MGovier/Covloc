@@ -9,7 +9,7 @@ Uses NodeJS and Express to run the server, use `npm init` to pull in dependencie
 Server will listen on port 8080 by default, and will serve requests at root. Simple API runs at `api/1/algorithms`, which is used by the client to populate available algorithms and add them to an internal object. The client will attempt to call `run()` on this object when the menu item is selected.
 
 ## Adding Algorithms
-Introducting a new algorithm requires 2 files to be placed in the server's algorithm folder:
+Adding a new algorithm requires 2 files to be placed in the server's `algorithm` folder:
 
 A short JSON descriptor of the format:
 
