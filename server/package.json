@@ -1,0 +1,31 @@
+{
+  "name": "covloc",
+  "version": "0.0.1",
+  "description": "JSON architecture for running of algorithms on map data.",
+  "main": "server.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MGovier/Covloc.git"
+  },
+  "keywords": [
+    "json",
+    "api",
+    "google",
+    "maps"
+  ],
+  "author": "mg sd cs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MGovier/Covloc/issues"
+  },
+  "homepage": "https://github.com/MGovier/Covloc#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
