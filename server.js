@@ -98,8 +98,9 @@ function refreshAlgorithms() {
       }).forEach((algo) => {
         fs.readFile(ALGO_DIR + algo, 'utf8', (err, data) => {
           if (err) {
-            return err;
+            return console.log(`Error reading algorithm file ${algo} due to ${err}`);
           } else {
+            // Slice off the file extension.
             CovLocGlobals.algorithms[algo.slice(0,-5)] = JSON.parse(data);
           }
         });
