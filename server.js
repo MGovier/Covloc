@@ -1,4 +1,13 @@
+/**
+ * Express powered API server for Covert Location Framework.
+ * Developed for WebRes 2015/16 Sprint 1.
+ *
+ * @author T9
+ */
+
 'use strict';
+
+// VARIABLES
 
 // NPM Modules
 var express = require('express'),
@@ -11,13 +20,14 @@ var CovLocGlobals = CovLocGlobals || {};
     CovLocGlobals.algorithms = {};
 
 // Static Variables
-var API_BASE_URL = '/api/1/',
-    ALGO_DIR = 'algorithms/';
+const API_BASE_URL = '/api/1/',
+      ALGO_DIR = 'algorithms/';
 
+// SERVER CONFIG
 
-// Watch directory for changes and trigger a refresh of the data if so.
+// Watch directory for changes and trigger a refresh of the algorithm data if so.
 watchr.watch({
-  path: 'algorithms',
+  path: ALGO_DIR,
   listeners: {
     error: (err) => {
       console.log('Error:', err);
@@ -43,13 +53,16 @@ watchr.watch({
   }
 });
 
+// Enable CORS to allow future cross-domain API usage.
 CovLocGlobals.app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
+// Set static directories to serve.
 CovLocGlobals.app.use(express.static('algorithms'));
+// HTTPD or Nginx might be better for serving client as it's static, but this is used for testing:
 CovLocGlobals.app.use(express.static('client'));
 
 // GET request for algorithms.
@@ -58,22 +71,21 @@ CovLocGlobals.app.get(API_BASE_URL + 'algorithms', (req, res) => {
   res.send(CovLocGlobals.algorithms);
 });
 
-// CovLocGlobals.algorithmList.forEach((algo) => {
-//   CovLocGlobals.app.get(API_BASE_URL + algo, (req, res) => {
-//     res.send()
-//   });
-// });
-
 // Start up server.
-var server = CovLocGlobals.app.listen(8080, () => {
-  var host = server.address().address,
+let server = CovLocGlobals.app.listen(8080, () => {
+  let host = server.address().address,
       port = server.address().port;
 
-  console.log('CovLoc API running at http://%s:%s', host, port);
+  console.log(`CovLoc API running at http://${host}:${port}`);
 });
 
-// Scan through the algorithms folder for files.
-// Load each JSON descriptor into internal object to cache.
+/** 
+ * Scan through the algorithms folder for files.
+ * Load each JSON descriptor into internal object to cache for better performance.
+ *
+ * For each file in the algorithm directory, first filter to only JSON files, 
+ * then add the file's name to the global object for API requests.
+ */
 function refreshAlgorithms() {
   CovLocGlobals.algorithms = {};
   fs.readdir(ALGO_DIR, (err, results) => {
@@ -83,16 +95,13 @@ function refreshAlgorithms() {
       results.filter(function(file) { 
         return file.substr(-5).toLowerCase() === '.json'; 
       }).forEach((algo) => {
-        // Don't read dot-files (.DS_Store...)
-        if (algo.indexOf('.') !== 0) {
-          fs.readFile(ALGO_DIR + algo, 'utf8', (err, data) => {
-            if (err) {
-              return err;
-            } else {
-              CovLocGlobals.algorithms[algo.slice(0,-5)] = JSON.parse(data);
-            }
-          });
-        }
+        fs.readFile(ALGO_DIR + algo, 'utf8', (err, data) => {
+          if (err) {
+            return err;
+          } else {
+            CovLocGlobals.algorithms[algo.slice(0,-5)] = JSON.parse(data);
+          }
+        });
       });     
     }
   });
