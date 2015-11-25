@@ -54,6 +54,7 @@ watchr.watch({
 });
 
 // Enable CORS to allow future cross-domain API usage.
+// Source: http://enable-cors.org/server_expressjs.html
 CovLocGlobals.app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
