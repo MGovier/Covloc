@@ -1,32 +1,33 @@
 'use strict';
 
 covertMap.algorithms.SAMSites = function () {
+
+  var collectionOfElevations = [];
+
   function run() {    
     // (a) Add current SAMs
     addCurrentSAMLocations();
+    var elevationServiceComplete = function(elevations) {
+      console.log(elevations);
 
-    // (b) Calculate average of current sites
-    var elevations = getElevation(locations);
-    //var distances = getDistancesFromSea();
-    elevations = collectionOfElevations;
-    console.log(elevations);
+      var totalElevation = 0;
+      for (var i = 0; i < elevations.length; i++) {
+        console.log('we in');
+        totalElevation += elevations[i];
+      }
 
-    var totalElevation = 0;
-    for (var i = 0;i < elevations.length;i++) {
-      console.log('we in');
-      totalElevation += elevations[i];
+      var averageElevation = totalElevation / elevations.length;
+
+      // (c) Set SAM site elevation boundaries
+      getElevationBoundaries(elevations);
     }
+    // (b) Calculate average of current sites
+    var elevations = getElevation(locations, elevationServiceComplete);
+    //var distances = getDistancesFromSea();
 
-    var averageElevation = totalElevation / elevations.length;
-
-    // (c) Set SAM site elevation boundaries
-    getElevationBoundaries(elevations);
-    
-    
   }
 
-  var collectionOfElevations = new Array();
-  function getElevation(collectionOfLocations) {
+  function getElevation(collectionOfLocations, callback) {
     var elevator = new google.maps.ElevationService();
 
     // Loop through locations
@@ -42,14 +43,14 @@ covertMap.algorithms.SAMSites = function () {
         if (status === google.maps.ElevationStatus.OK) {
           var val = results[0].elevation;
           collectionOfElevations.push(val);
-        } 
+          if (collectionOfElevations.length === collectionOfLocations.length) {
+            callback(collectionOfElevations);
+          }
+        } else {
+          alert('Google Elevation API Error in SAMSites');
+        }
       }) 
-    }
-
-    console.log('The money: ' + collectionOfElevations);
-    
-    return collectionOfElevations;
-    
+    } 
   }
 
   function getElevationBoundaries(elevations) {
