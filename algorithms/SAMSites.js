@@ -20,7 +20,7 @@ covertMap.algorithms.SAMSites = function () {
 
       // (c) Set SAM site elevation boundaries
       getElevationBoundaries(elevations);
-    }
+    };
     // (b) Calculate average of current sites
     var elevations = getElevation(locations, elevationServiceComplete);
     //var distances = getDistancesFromSea();
@@ -29,6 +29,18 @@ covertMap.algorithms.SAMSites = function () {
 
   function getElevation(collectionOfLocations, callback) {
     var elevator = new google.maps.ElevationService();
+    var elevatorResponse = function(results, status) {
+      if (status === google.maps.ElevationStatus.OK) {
+        var val = results[0].elevation;
+        collectionOfElevations.push(val);
+        // Test if all of our requests have now been returned
+        if (collectionOfElevations.length === collectionOfLocations.length) {
+          callback(collectionOfElevations);
+        }
+      } else {
+        alert('Google Elevation API Error in SAMSites');
+      }
+    };
 
     // Loop through locations
     for (var i = 0;i < collectionOfLocations.length; i++) {
@@ -39,17 +51,7 @@ covertMap.algorithms.SAMSites = function () {
 
       elevator.getElevationForLocations({ 
         'locations': [latLon]
-      }, function(results, status) {
-        if (status === google.maps.ElevationStatus.OK) {
-          var val = results[0].elevation;
-          collectionOfElevations.push(val);
-          if (collectionOfElevations.length === collectionOfLocations.length) {
-            callback(collectionOfElevations);
-          }
-        } else {
-          alert('Google Elevation API Error in SAMSites');
-        }
-      }) 
+      }, elevatorResponse);
     } 
   }
 
@@ -114,7 +116,7 @@ covertMap.algorithms.SAMSites = function () {
     ['russia',  54.7478248936, 19.9706574888  , 46]
     ];
 
-    // Could get locations dynamically, e.g. assign values to "locations"
+    // Could get locations dynamically, e.g. assign values to 'locations'
 
     var infowindow = new google.maps.InfoWindow();
 
@@ -123,7 +125,7 @@ covertMap.algorithms.SAMSites = function () {
       var marker = new google.maps.Marker({
         position: new google.maps.LatLng(locations[i][1], locations[i][2]),
         map: covertMap.map,
-        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
       });
 
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
@@ -131,11 +133,11 @@ covertMap.algorithms.SAMSites = function () {
           // Capitalise first letter of location
           infowindow.setContent(locations[i][0].charAt(0).toUpperCase() + locations[i][0].slice(1));
           infowindow.open(covertMap.map, marker);
-        }
+        };
       })(marker, i));
     }
   }
   return {
     run: run
-  }
+  };
 }();
