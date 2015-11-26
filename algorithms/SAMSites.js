@@ -15,19 +15,21 @@ covertMap.algorithms.SAMSites = function () {
         console.log('we in');
         totalElevation += elevations[i];
       }
-
+      // (b) Calculate average of current sites
       var averageElevation = totalElevation / elevations.length;
 
       // (c) Set SAM site elevation boundaries
       getElevationBoundaries(elevations);
+
+      //var distances = getDistancesFromSea();
     };
-    // (b) Calculate average of current sites
-    var elevations = getElevation(locations, elevationServiceComplete);
-    //var distances = getDistancesFromSea();
+    
+    getElevation(locations, elevationServiceComplete);
+    
 
   }
 
-  function getElevation(collectionOfLocations, callback) {
+  function getElevation(collectionOfLocations, elevationServiceComplete) {
     var elevator = new google.maps.ElevationService();
     var elevatorResponse = function(results, status) {
       if (status === google.maps.ElevationStatus.OK) {
@@ -35,7 +37,7 @@ covertMap.algorithms.SAMSites = function () {
         collectionOfElevations.push(val);
         // Test if all of our requests have now been returned
         if (collectionOfElevations.length === collectionOfLocations.length) {
-          callback(collectionOfElevations);
+          elevationServiceComplete(collectionOfElevations);
         }
       } else {
         alert('Google Elevation API Error in SAMSites');
