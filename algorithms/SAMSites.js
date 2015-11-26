@@ -15,22 +15,15 @@ covertMap.algorithms.SAMSites = function () {
       }
 
       // (b) Calculate average of current sites
-      
       //var distances = getDistancesFromSea();
-      console.log(collectionOfElevations);
-
       var averageElevation = totalElevation / collectionOfElevations.length;
+      console.log( 'The average: ' + averageElevation)
 
       // (c) Set SAM site elevation boundaries
-      getElevationBoundaries(collectionOfElevations);
-
-      //var distances = getDistancesFromSea();
+      console.log( 'The midrange: ' + getElevationBoundaries(collectionOfElevations) );
     };
 
     getElevation(locations, elevationServiceComplete);
-
-    // (c) Set SAM site elevation boundaries
-    //getElevationBoundaries(elevations);
   }
 
   function getElevation(collectionOfLocations, elevationServiceComplete) {
@@ -67,8 +60,13 @@ covertMap.algorithms.SAMSites = function () {
 
   function getElevationBoundaries(elevations) {
     for (var i = 0;i < elevations.length;i++) {
-
+      // Best way to get boundaries????
     }
+
+    var max = Math.max.apply(Math, elevations);
+    var min = Math.min.apply(Math, elevations);
+
+    return max - min;
   }
 
   function getDistancesFromSea() {
