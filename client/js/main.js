@@ -1,19 +1,17 @@
 /**
  * Client script to create map object, and pull in algorithms from API. 
  * Handles UI events and setting areas for algorithms to run.
- * Built for WebRes 2015/16 in sprint 1.
+ * Built for WebRes 2015/16 Sprint 1.
  *
  * @author T9
  */
 
 'use strict';
 
-// Namespace object for the map, it's functions, globals, algorithms.
+// Namespace object for the map, functions, globals, algorithms.
 var covertMap = covertMap || {};
 
 covertMap.functions = function() {
-
-  var geocoder;
 
   function pageLoaded() {
     $('.location-search').submit(enterSearch);
@@ -30,12 +28,14 @@ covertMap.functions = function() {
     $('#searchRadius').keyup(setRadius);
   }
 
+
   var enterSearch = function (evt) {
     evt.preventDefault();
-    var searchTerm = evt.currentTarget[0].value;
+    let searchTerm = evt.currentTarget[0].value;
     findLocation(searchTerm);
     covertMap.map.setZoom(13);
   };
+
 
   var initMap = function() {
     covertMap.map = new google.maps.Map(document.getElementById('map-view'), {
@@ -45,23 +45,22 @@ covertMap.functions = function() {
     });
 
     google.maps.event.addListener(covertMap.map, 'zoom_changed', function() {
-      //console.log(covertMap.map.getZoom());
-      var minZoomLevel = 13;
-     if (covertMap.map.getZoom() < minZoomLevel) covertMap.map.setZoom(minZoomLevel);
+      let minZoomLevel = 13;
+      if (covertMap.map.getZoom() < minZoomLevel) covertMap.map.setZoom(minZoomLevel);
    });
 
   };
 
-  var searchCenter;
+
   function findLocation(search) {
-    geocoder = new google.maps.Geocoder();
+    let geocoder = new google.maps.Geocoder();
     geocoder.geocode({ 'address': search}, function(results, status) {
       if (status === google.maps.GeocoderStatus.OK) {
         if (results[0]) {
           covertMap.map.setCenter(results[0].geometry.location);
           covertMap.map.setZoom(10);
-          searchCenter = results[0].geometry.location;
-          drawCircle();
+          let searchCenter = results[0].geometry.location;
+          drawCircle(searchCenter);
         } else {
           window.alert('No results found');
         }
@@ -71,7 +70,8 @@ covertMap.functions = function() {
     });
   }
 
-  function drawCircle() { 
+
+  function drawCircle(searchCenter) { 
 
       covertMap.circle = new google.maps.Circle({
         strokeColor: '#FF0000',
@@ -114,15 +114,14 @@ covertMap.functions = function() {
     }
   }
 
-  function getRadius(value, unit) {
 
+  function getRadius(value, unit) {
     if (unit.trim() == 'Metres') {
       return value;
     }
     else if (unit.trim() == 'Miles') {
       return value * 1609.34;
     }
-
   }
 
 
@@ -166,6 +165,7 @@ covertMap.functions = function() {
     });
   }
 
+
   function elevationView() {
     clearState();
     $('#elevation-map').addClass('active');
@@ -202,6 +202,7 @@ covertMap.functions = function() {
     }
   }
 
+
   function getAlgorithms() {
     $.get('http://localhost:8080/api/1/algorithms')
       .done((data) => {
@@ -211,6 +212,7 @@ covertMap.functions = function() {
         alert('Algorithm API failed due to: ' + err);
       });
   }
+
 
   function buildMenu (algorithmData) {
     covertMap.algorithms = {};
@@ -225,11 +227,13 @@ covertMap.functions = function() {
     $('.algo-menu li').on('click', runAlgo);
   }
 
+
   function runAlgo(evt) {
     clearState();
     $(evt.currentTarget).addClass('active');
     covertMap.algorithms[evt.currentTarget.id].run();
   }
+
 
   return {
       pageLoaded: pageLoaded,
@@ -237,5 +241,6 @@ covertMap.functions = function() {
       drawView: drawView
   };
 }();
+
 
 window.addEventListener('load', covertMap.functions.pageLoaded);

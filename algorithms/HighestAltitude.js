@@ -28,7 +28,6 @@ covertMap.algorithms.HighestAltitude = function () {
           // Retrieve the first result
           if (results[0]) {
             for (var i = 0; i < results.length; i++) {
-              console.log(results[i]);
               if (results[i].elevation > highestPoint) {
                 highest = results[i];
                 highestPoint = results[i].elevation;
@@ -38,10 +37,10 @@ covertMap.algorithms.HighestAltitude = function () {
               position: highest.location,
               map: covertMap.map,
               label: 'H',
-              title: 'This is the highest point with elevation of ' + highestPoint
+              title: `This is the highest point with an elevation of ${highestPoint.toFixed(4)} meters.`
             });
             let infowindow = new google.maps.InfoWindow({
-              content: 'This is the highest point with an elevation of ' + highestPoint
+              content: `This is the highest point with an elevation of ${highestPoint.toFixed(4)} meters.`
             });
             infowindow.open(covertMap.map, marker);
           } else {
@@ -54,9 +53,10 @@ covertMap.algorithms.HighestAltitude = function () {
     } else {
       alert('Sorry, this algorithm requires an area to be searched for and a radius defined. Please select choose location and try again!');
     }
-
   }
+
   return {
     run: run
   };
+
 }();
