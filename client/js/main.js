@@ -1,5 +1,14 @@
+/**
+ * Client script to create map object, and pull in algorithms from API. 
+ * Handles UI events and setting areas for algorithms to run.
+ * Built for WebRes 2015/16 in sprint 1.
+ *
+ * @author T9
+ */
+
 'use strict';
 
+// Namespace object for the map, it's functions, globals, algorithms.
 var covertMap = covertMap || {};
 
 covertMap.functions = function() {
@@ -43,8 +52,6 @@ covertMap.functions = function() {
 
   };
 
-
-
   var searchCenter;
   function findLocation(search) {
     geocoder = new google.maps.Geocoder();
@@ -64,10 +71,9 @@ covertMap.functions = function() {
     });
   }
 
-  var circle;
   function drawCircle() { 
 
-      circle = new google.maps.Circle({
+      covertMap.circle = new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -85,9 +91,7 @@ covertMap.functions = function() {
     google.maps.event.clearListeners(covertMap.map);
     covertMap.map.setMapTypeId(google.maps.MapTypeId.HYBRID);
     $('.left-menu').hide();
-    $('#pick-location').removeClass('active');
-    $('#draw-map').removeClass('active');
-    $('#elevation-map').removeClass('active');
+    $('.sidebar li').removeClass('active');
   }
 
   function updateChosenRadius() {
@@ -98,22 +102,19 @@ covertMap.functions = function() {
   }
 
   function setRadius() {
-    var unit = $('.searchRadiusBtn').text();
-    var value = document.getElementById('searchRadius').value;
+    let unit = $('.searchRadiusBtn').text(),
+        value = document.getElementById('searchRadius').value;
     
-
-    if (value != null && circle != null) {
+    if (value !== null && covertMap.circle !== null) {
       // Update current circle
-      circle.setMap(null);
-      var radius = parseInt(getRadius(value, unit));
-      circle.radius = radius;
-      circle.setMap(covertMap.map);
+      covertMap.circle.setMap(null);
+      let radius = parseInt(getRadius(value, unit));
+      covertMap.circle.radius = radius;
+      covertMap.circle.setMap(covertMap.map);
     }
   }
 
   function getRadius(value, unit) {
-    // Standard value is in metres, so any other unit must be converted to metres
-    var radius = 0;
 
     if (unit.trim() == 'Metres') {
       return value;
@@ -122,14 +123,13 @@ covertMap.functions = function() {
       return value * 1609.34;
     }
 
-    //return null;
   }
 
 
   function drawView() {
     clearState();
     $('#draw-map').addClass('active');
-    var drawingManager = new google.maps.drawing.DrawingManager();
+    let drawingManager = new google.maps.drawing.DrawingManager();
     
     covertMap.map.addListener('click', function(e) {
       alert(e.getPosition());
@@ -138,11 +138,11 @@ covertMap.functions = function() {
     $('.left-menu').show();
 
     $('.left-menu-item').click(function() {
-      var index = $( ".left-menu-item" ).index( this );
+      let index = $( '.left-menu-item' ).index( this );
       
       // Menu item classes
-      var draw = $('.left-menu-item:eq(0)');
-      var select = $('.left-menu-item:eq(1)');
+      let draw = $('.left-menu-item:eq(0)'),
+          select = $('.left-menu-item:eq(1)');
 
       // If draw was selected
       if (index === 0) {
@@ -169,13 +169,14 @@ covertMap.functions = function() {
   function elevationView() {
     clearState();
     $('#elevation-map').addClass('active');
-    var elevator = new google.maps.ElevationService();
-    var infowindow = new google.maps.InfoWindow({map: covertMap.map});
+    let elevator = new google.maps.ElevationService(),
+        infowindow = new google.maps.InfoWindow({map: covertMap.map});
+
     covertMap.map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
 
     var updateInfo = function (event) {
       displayLocationElevation(event.latLng, elevator, infowindow);
-    }
+    };
 
     covertMap.map.addListener('click', updateInfo);
 
@@ -206,32 +207,35 @@ covertMap.functions = function() {
       .done((data) => {
         buildMenu(data);
       })
-      .fail(() => {
-        alert('API Fail');
+      .fail((err) => {
+        alert('Algorithm API failed due to: ' + err);
       });
   }
 
   function buildMenu (algorithmData) {
     covertMap.algorithms = {};
-    for (var algo in algorithmData) {
+    for (let algo in algorithmData) {
+      // Don't use prototype...
       if (algorithmData.hasOwnProperty(algo)) {
-        var obj = algorithmData[algo];
+        let obj = algorithmData[algo];
         $('.algo-menu').append('<li id="' + obj.name + '"><a href="#">' + obj.description + '</a></li>');
         $.getScript(obj.file);
-        $('.algo-menu').on('click', '#' + obj.name, (evt) => {
-          covertMap.algorithms[evt.currentTarget.id].run();
-        });
       }
-    } 
+    }
+    $('.algo-menu li').on('click', runAlgo);
   }
- 
+
+  function runAlgo(evt) {
+    clearState();
+    $(evt.currentTarget).addClass('active');
+    covertMap.algorithms[evt.currentTarget.id].run();
+  }
 
   return {
       pageLoaded: pageLoaded,
       initMap: initMap,
       drawView: drawView
   };
-
 }();
 
 window.addEventListener('load', covertMap.functions.pageLoaded);

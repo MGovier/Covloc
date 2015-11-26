@@ -5,6 +5,7 @@ covertMap.algorithms.SAMSites = function () {
   function run() {    
     // (a) Add current SAMs
     addCurrentSAMLocations();
+    
     // Callback to be executed by the getElevation function when it is finished.
     var elevationServiceComplete = function(collectionOfElevations) {
       var totalElevation = 0;
