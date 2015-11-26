@@ -16,15 +16,21 @@ covertMap.algorithms.SAMSites = function () {
         totalElevation += elevations[i];
       }
 
+      // (b) Calculate average of current sites
+      var elevations = getElevation(locations);
+      //var distances = getDistancesFromSea();
+      //elevations = collectionOfElevations;
+      console.log(elevations);
+      console.log(collectionOfElevations);
+
       var averageElevation = totalElevation / elevations.length;
 
       // (c) Set SAM site elevation boundaries
       getElevationBoundaries(elevations);
     };
-    // (b) Calculate average of current sites
-    var elevations = getElevation(locations, elevationServiceComplete);
-    //var distances = getDistancesFromSea();
 
+    // (c) Set SAM site elevation boundaries
+    //getElevationBoundaries(elevations);
   }
 
   function getElevation(collectionOfLocations, callback) {
@@ -53,6 +59,16 @@ covertMap.algorithms.SAMSites = function () {
         'locations': [latLon]
       }, elevatorResponse);
     } 
+      }, function(results, status) {
+        if (status === google.maps.ElevationStatus.OK) {
+          var val = results[0].elevation;
+          collectionOfElevations.push(val);
+        } 
+      }) 
+    }
+
+    //console.log('The money: ' + collectionOfElevations);
+    return collectionOfElevations;
   }
 
   function getElevationBoundaries(elevations) {
