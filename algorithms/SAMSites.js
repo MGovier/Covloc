@@ -2,34 +2,38 @@
 
 covertMap.algorithms.SAMSites = function () {
 
-  var collectionOfElevations = [];
-
   function run() {    
     // (a) Add current SAMs
     addCurrentSAMLocations();
-    var elevationServiceComplete = function(elevations) {
-      console.log(elevations);
-
+    // Callback to be executed by the getElevation function when it is finished.
+    var elevationServiceComplete = function(collectionOfElevations) {
       var totalElevation = 0;
-      for (var i = 0; i < elevations.length; i++) {
+      for (var i = 0; i < collectionOfElevations.length; i++) {
         console.log('we in');
-        totalElevation += elevations[i];
+        totalElevation += collectionOfElevations[i];
       }
+
       // (b) Calculate average of current sites
-      var averageElevation = totalElevation / elevations.length;
+      
+      //var distances = getDistancesFromSea();
+      console.log(collectionOfElevations);
+
+      var averageElevation = totalElevation / collectionOfElevations.length;
 
       // (c) Set SAM site elevation boundaries
-      getElevationBoundaries(elevations);
+      getElevationBoundaries(collectionOfElevations);
 
       //var distances = getDistancesFromSea();
     };
-    
-    getElevation(locations, elevationServiceComplete);
-    
 
+    getElevation(locations, elevationServiceComplete);
+
+    // (c) Set SAM site elevation boundaries
+    //getElevationBoundaries(elevations);
   }
 
   function getElevation(collectionOfLocations, elevationServiceComplete) {
+    var collectionOfElevations = [];
     var elevator = new google.maps.ElevationService();
     var elevatorResponse = function(results, status) {
       if (status === google.maps.ElevationStatus.OK) {
@@ -54,7 +58,10 @@ covertMap.algorithms.SAMSites = function () {
       elevator.getElevationForLocations({ 
         'locations': [latLon]
       }, elevatorResponse);
-    } 
+    }
+
+    //console.log('The money: ' + collectionOfElevations);
+    return collectionOfElevations;
   }
 
   function getElevationBoundaries(elevations) {
