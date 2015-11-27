@@ -86,6 +86,9 @@ covertMap.functions = function() {
       covertMap.circle.setDraggable(true);
       // Place default radius in input box (1000m)
       document.getElementById('searchRadius').value = 1000;
+
+      // Set map to chosen location
+      covertMap.map.setCenter(searchCenter);
   }
 
   function clearState() {
