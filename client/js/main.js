@@ -58,7 +58,6 @@ covertMap.functions = function() {
       if (status === google.maps.GeocoderStatus.OK) {
         if (results[0]) {
           covertMap.map.setCenter(results[0].geometry.location);
-          covertMap.map.setZoom(10);
           let searchCenter = results[0].geometry.location;
           drawCircle(searchCenter);
           // Enable angorithms:

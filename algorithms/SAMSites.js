@@ -10,20 +10,28 @@ covertMap.algorithms.SAMSites = function () {
     var elevationServiceComplete = function(collectionOfElevations) {
       var totalElevation = 0;
       for (var i = 0; i < collectionOfElevations.length; i++) {
-        console.log('we in');
         totalElevation += collectionOfElevations[i];
       }
 
       // (b) Calculate average of current sites
-      //var distances = getDistancesFromSea();
       var averageElevation = totalElevation / collectionOfElevations.length;
       console.log( 'The average: ' + averageElevation)
-
-      // (c) Set SAM site elevation boundaries
-      console.log( 'The midrange: ' + getElevationBoundaries(collectionOfElevations) );
     };
 
     getElevation(locations, elevationServiceComplete);
+
+    // FIND closest SAM site geographically
+    //var circCentre = { lat: covertMap.circle.center.lat, lng: covertMap.circle.center.lng };
+    //console.log(covertMap.circle.center.lng);
+    var circCentre = new google.maps.LatLng(covertMap.circle.center.lat(), covertMap.circle.center.lng());
+    var closestSAMAlt = getClosestSAMAltitude(circCentre);
+    console.log(closestSAMAlt);
+
+    // CALCULATE the average elevation for selected radius
+    //compareElevations(circCentre, radius);
+
+    // COMPARE points in selected radius to altitude of SAM site
+    // IF fails, then run against average of all SAM sites, seeing if it fits 
   }
 
   function getElevation(collectionOfLocations, elevationServiceComplete) {
@@ -45,31 +53,51 @@ covertMap.algorithms.SAMSites = function () {
     // Loop through locations
     for (var i = 0;i < collectionOfLocations.length; i++) {
       var lat = collectionOfLocations[i][1];
-      var lon = collectionOfLocations[i][2];
+      var lng = collectionOfLocations[i][2];
 
-      var latLon = { lat: lat, lng: lon };
+      var latLng = { lat: lat, lng: lng };
 
       elevator.getElevationForLocations({ 
-        'locations': [latLon]
+        'locations': [latLng]
       }, elevatorResponse);
     }
 
-    //console.log('The money: ' + collectionOfElevations);
     return collectionOfElevations;
   }
 
-  function getElevationBoundaries(elevations) {
-    for (var i = 0;i < elevations.length;i++) {
-      // Best way to get boundaries????
+  function getClosestSAMAltitude(centre) {
+
+    // Find closest SAM
+    let closestSAM = { id: "", latLng: 0 };
+
+    for (let i = 0;i < locations.length;i++) {
+      let samLoc = new google.maps.LatLng(locations[i][1], locations[i][2]);
+      var distance = google.maps.geometry.spherical.computeDistanceBetween(centre, samLoc);
+
+      if (i === 0 || distance < closestSAM.latLng) { 
+        closestSAM.id = i; 
+        closestSAM.latLng = samLoc; 
+      }
     }
 
-    var max = Math.max.apply(Math, elevations);
-    var min = Math.min.apply(Math, elevations);
+    console.log('Closest SAM site: ' + closestSAM.latLng);
 
-    return max - min;
+    // When elevation has completed
+    function closestSAMAltResponse(results, status) {
+      if (status === google.maps.ElevationService.OK) {
+        return results[0].elevation;
+      }
+    }
+
+    var elevator = new google.maps.ElevationService();
+    elevator.getElevationForLocations({ 
+        'locations': [centre]
+      }, closestSAMAltResponse);
+
   }
 
-  function getDistancesFromSea() {
+
+  function compareElevations(centre, radius) {
 
   }
 
