@@ -61,6 +61,8 @@ covertMap.functions = function() {
           covertMap.map.setZoom(10);
           let searchCenter = results[0].geometry.location;
           drawCircle(searchCenter);
+          // Enable angorithms:
+          $('.algo-menu li').on('click', runAlgo);
         } else {
           window.alert('No results found');
         }
@@ -72,7 +74,6 @@ covertMap.functions = function() {
 
 
   function drawCircle(searchCenter) { 
-
       covertMap.circle = new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
@@ -82,7 +83,7 @@ covertMap.functions = function() {
         center: searchCenter,
         radius: 1000
       }); 
-
+      covertMap.circle.setDraggable(true);
       // Place default radius in input box (1000m)
       document.getElementById('searchRadius').value = 1000;
   }
@@ -224,7 +225,6 @@ covertMap.functions = function() {
         $.getScript(obj.file);
       }
     }
-    $('.algo-menu li').on('click', runAlgo);
   }
 
 

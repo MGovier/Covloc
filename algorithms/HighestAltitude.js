@@ -27,7 +27,7 @@ covertMap.algorithms.HighestAltitude = function () {
         if (status === google.maps.ElevationStatus.OK) {
           // Retrieve the first result
           if (results[0]) {
-            for (var i = 0; i < results.length; i++) {
+            for (let i = 0; i < results.length; i++) {
               if (results[i].elevation > highestPoint) {
                 highest = results[i];
                 highestPoint = results[i].elevation;
