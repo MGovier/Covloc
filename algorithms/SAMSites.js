@@ -24,10 +24,6 @@ covertMap.algorithms.SAMSites = function () {
     var circCentre = new google.maps.LatLng(covertMap.circle.center.lat(), covertMap.circle.center.lng());
     getClosestSAMAltitude(circCentre);
     var closestSamAlt;
-    function closestSAMAltitudeFound(alt) {
-      closestSAMAlt = alt;
-      console.log(closestSAMAlt);
-    }
     
 
     // CALCULATE the average elevation for selected radius
@@ -83,19 +79,27 @@ covertMap.algorithms.SAMSites = function () {
       }
     }
 
-    //console.log('Closest SAM site: ' + closestSAM.latLng);
+    function closestSAMAltitudeFound(alt) {
+      // ************
+      // TODO: Iterate through altitudes looking for acceptable margin.
+      // Or return no suitable position.
+      console.log('alt', alt);
+    }
 
     // When elevation has completed
-    function closestSAMAltResponse(results, status) {
-      if (status === google.maps.ElevationService.OK) {
-        altitude = results[0].elevation;
+    var closestSAMAltResponse = function(results, status) {
+      if (status === google.maps.ElevationStatus.OK) {
+        let altitude = results[0].elevation;
         closestSAMAltitudeFound(altitude);
+      } else {
+        console.log(status);
       }
     }
 
     var elevator = new google.maps.ElevationService();
+    console.log('closest sam:', closestSAM.latLng);
     elevator.getElevationForLocations({ 
-        'locations': [centre]
+        'locations': [closestSAM.latLng]
       }, closestSAMAltResponse);
   }
 
