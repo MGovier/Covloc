@@ -23,6 +23,7 @@ var CovLocGlobals = CovLocGlobals || {};
 const API_BASE_URL = '/api/1/',
       ALGO_DIR = 'algorithms/';
 
+
 // SERVER CONFIG
 
 // Watch directory for changes and trigger a refresh of the algorithm data if so.
@@ -79,6 +80,7 @@ let server = CovLocGlobals.app.listen(8080, () => {
 
   console.log(`CovLoc API running at http://${host}:${port}`);
 });
+
 
 /** 
  * Scan through the algorithms folder for files.
