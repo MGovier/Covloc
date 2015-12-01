@@ -65,6 +65,12 @@ body {
   color: #fff;
   background-color: #428bca;
 }
+.nav-title {
+  margin-left: 20px;
+}
+.list-group-item:hover {
+  cursor: pointer;
+}
 
 
 /*

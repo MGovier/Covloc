@@ -1,6 +1,12 @@
 'use strict';
 
 covertMap.algorithms.SAMSites = function () {
+  var mapMarkers = { markers: [] };
+  const CURR_SAM_LAYER = "Current SAM Layer";
+  const LOW_SAM_LAYER = "Low Probabilty SAM Layer";
+  const MED_SAM_LAYER = "Medium Probability SAM Layer";
+  const HIGH_SAM_LAYER = "High Probability SAM Layer";
+
   function run() {    
     // (a) Add current SAMs
     addCurrentSAMLocations();
@@ -88,6 +94,7 @@ covertMap.algorithms.SAMSites = function () {
         MED = 50,
         LOW = 100;
       
+      // TEST FOR SAM LIKELYHOOD - ** Can remove **
       //altitude = 500;
       // high (low) = 490, high (high) = 510
       // med (low) = 450, med (high) = 550
@@ -103,6 +110,7 @@ covertMap.algorithms.SAMSites = function () {
       //   alert('Low');
       // }
 
+      // Show all of the potential SAm sites on the map
       listSAMSiteProbability(alt);
 
   }
@@ -195,6 +203,10 @@ covertMap.algorithms.SAMSites = function () {
           infowindow.open(covertMap.map, marker);
         };
       })(marker, i));
+
+      // Add marker to JSON object
+      let markerObj = { marker: marker, layer: CURR_SAM_LAYER };
+      mapMarkers.markers.push(markerObj);
     }
   }
 
@@ -244,8 +256,14 @@ covertMap.algorithms.SAMSites = function () {
                 let infowindow = new google.maps.InfoWindow({
                   content: 'High'
                 });
-                //alert('High');
+                
+                // Increment counter, signifying that there has been at least one probable SAM site located 
                 checkCtr += 1;
+
+                // Add marker to JSON Object
+                let markerObj = { marker: marker, layer: HIGH_SAM_LAYER };
+                mapMarkers.markers.push(markerObj);
+
               } else if ( alt >= (SAMAlt - MED) && alt <= (SAMAlt + MED) ) {
                 let marker = new google.maps.Marker({
                   position: results[i].location,
@@ -257,8 +275,13 @@ covertMap.algorithms.SAMSites = function () {
                   content: 'High'
                 });
 
-                //alert('Medium');
+                // Increment counter, signifying that there has been at least one probable SAM site located 
                 checkCtr += 1;
+
+                // Add marker to JSON Object
+                let markerObj = { marker: marker, layer: MED_SAM_LAYER };
+                mapMarkers.markers.push(markerObj);
+
               } else if ( alt >= (SAMAlt - LOW) && alt <= (SAMAlt + LOW) ) {
                 let marker = new google.maps.Marker({
                   position: results[i].location,
@@ -270,8 +293,13 @@ covertMap.algorithms.SAMSites = function () {
                   content: 'High'
                 });
 
-                //alert('Low');
+                // Increment counter, signifying that there has been at least one probable SAM site located 
                 checkCtr += 1;
+
+                // Add marker to JSON Object
+                let markerObj = { marker: marker, layer: LOW_SAM_LAYER };
+                mapMarkers.markers.push(markerObj);
+
               }
 
             }

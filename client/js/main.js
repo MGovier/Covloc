@@ -26,6 +26,7 @@ covertMap.functions = function() {
     $('#searchRadius').keydown( function(e) { if (e.which == 13) { setRadius(); } });
     getAlgorithms();
     $('#searchRadius').keyup(setRadius);
+    $('.list-group li').click(toggleMarkers);
   }
 
 
@@ -80,9 +81,11 @@ covertMap.functions = function() {
         fillColor: '#FF0000',
         map: covertMap.map,
         center: searchCenter,
-        radius: 1000
+        radius: 1000,
+        geodesic: true,
+        draggable: true
       }); 
-      covertMap.circle.setDraggable(true);
+
       // Place default radius in input box (1000m)
       document.getElementById('searchRadius').value = 1000;
 
@@ -166,6 +169,42 @@ covertMap.functions = function() {
       }
 
     });
+  }
+
+  function toggleMarkers() {
+    // check the index
+    let index = $(this).index();
+    //alert(index);
+    if (index > 0) {
+      if (index === 1) {
+        // If markers are currently on the map
+        if ( $('.toggle-button').eq( index - 1).hasClass('list-group-item-success') ) {
+          
+          // [MG] need to access map markers object here
+           
+
+        } else {
+
+        }
+        
+
+      } else if (index === 2) {
+
+      } else if (index === 3) {
+
+      } else {
+
+      }
+
+      // Toggle the class for visual aid
+      $('.toggle-button').eq( index - 1 ).toggleClass('list-group-item-success');
+    }
+    
+    
+    // toggle the class
+    // if on, hide markers
+    // if off, show markers
+
   }
 
 
