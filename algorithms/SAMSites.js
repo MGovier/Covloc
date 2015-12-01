@@ -1,7 +1,6 @@
 'use strict';
 
 covertMap.algorithms.SAMSites = function () {
-
   function run() {    
     // (a) Add current SAMs
     addCurrentSAMLocations();
@@ -23,16 +22,14 @@ covertMap.algorithms.SAMSites = function () {
     // FIND closest SAM site geographically
     var circCentre = new google.maps.LatLng(covertMap.circle.center.lat(), covertMap.circle.center.lng());
     getClosestSAMAltitude(circCentre);
-    var closestSamAlt;
-    
-
-    // CALCULATE the average elevation for selected radius
-    //compareElevations(circCentre, radius);
 
     // COMPARE points in selected radius to altitude of SAM site
     // IF fails, then run against average of all SAM sites, seeing if it fits 
   }
 
+  /// -------------------------------------------------------
+  /// Get list of elevations, given a list of Lat Lng objects 
+  /// -------------------------------------------------------
   function getElevation(collectionOfLocations, elevationServiceComplete) {
     var collectionOfElevations = [];
     var elevator = new google.maps.ElevationService();
@@ -64,6 +61,9 @@ covertMap.algorithms.SAMSites = function () {
     return collectionOfElevations;
   }
 
+  /// ---------------------------------------------------------------
+  /// Get the altitude of the closest SAM site to the search location
+  /// ---------------------------------------------------------------
   function getClosestSAMAltitude(centre) {
 
     // Find closest SAM
@@ -79,18 +79,38 @@ covertMap.algorithms.SAMSites = function () {
       }
     }
 
-    function closestSAMAltitudeFound(alt) {
+  function closestSAMAltitudeFound(alt) {
       // ************
       // TODO: Iterate through altitudes looking for acceptable margin.
       // Or return no suitable position.
       console.log('alt', alt);
-    }
+      let HIGH = 10,
+        MED = 50,
+        LOW = 100;
+      
+      //altitude = 500;
+      // high (low) = 490, high (high) = 510
+      // med (low) = 450, med (high) = 550
+      // low (low) = 400, low (high) = 600
+      //var samAlt = 500;
+      //alt = 600;
+
+      // if ( alt >= (samAlt - HIGH) && alt <= (samAlt + HIGH) ){
+      //   alert('High');
+      // } else if ( alt >= (samAlt - MED) && alt <= (samAlt + MED) ) {
+      //   alert('Medium');
+      // } else if ( alt >= (samAlt - LOW) && alt <= (samAlt + LOW) ) {
+      //   alert('Low');
+      // }
+
+      listSAMSiteProbability(alt);
+
+  }
 
     // When elevation has completed
     var closestSAMAltResponse = function(results, status) {
       if (status === google.maps.ElevationStatus.OK) {
-        let altitude = results[0].elevation;
-        closestSAMAltitudeFound(altitude);
+        closestSAMAltitudeFound(results[0].elevation);
       } else {
         console.log(status);
       }
@@ -103,12 +123,10 @@ covertMap.algorithms.SAMSites = function () {
       }, closestSAMAltResponse);
   }
 
-
-  function compareElevations(centre, radius) {
-
-  }
-
   var locations;  
+  /// -------------------------------------
+  /// Add known SAM locations to map object
+  /// -------------------------------------
   function addCurrentSAMLocations() {
     locations = [
     ['England',  55.0517923211, -2.55790018136 , 1],
@@ -179,6 +197,107 @@ covertMap.algorithms.SAMSites = function () {
       })(marker, i));
     }
   }
+
+  /// -----------------------------------------------------
+  /// Places markers on Map to identify potential SAM sites
+  /// -----------------------------------------------------
+  function listSAMSiteProbability(SAMAlt) {
+    let HIGH = 10,
+       MED = 50,
+       LOW = 100;
+
+       if (covertMap.circle) {
+        let bounds = covertMap.circle.getBounds(),
+          ne = bounds.getNorthEast(),
+          sw = bounds.getSouthWest(),
+          se = new google.maps.LatLng(sw.lat(), ne.lng()),
+          coords = [],
+          hSteps = Math.abs(sw.lng() - se.lng()) / 10,
+          vSteps = Math.abs(ne.lat() - se.lat()) / 10,
+          elevator = new google.maps.ElevationService();
+
+        for (let i = sw.lng(); i <= se.lng(); i += hSteps) {
+          for (let j = se.lat(); j <= ne.lat(); j += vSteps) {
+            coords.push(new google.maps.LatLng(j, i));
+          }
+        }
+
+        elevator.getElevationForLocations({
+          'locations': coords
+        }, function(results, status) {
+
+        if (status === google.maps.ElevationStatus.OK) {
+          var checkCtr = 0;
+
+          // Check there are probable SAM sites
+          if (results[0]) {
+            for (let i = 0; i < results.length; i++) {
+              var alt = results[i].elevation;
+
+              if ( alt >= (SAMAlt - HIGH) && alt <= (SAMAlt + HIGH) ){
+                let marker = new google.maps.Marker({
+                  position: results[i].location,
+                  map: covertMap.map,
+                  title: 'High',
+                  icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+                });
+                let infowindow = new google.maps.InfoWindow({
+                  content: 'High'
+                });
+                //alert('High');
+                checkCtr += 1;
+              } else if ( alt >= (SAMAlt - MED) && alt <= (SAMAlt + MED) ) {
+                let marker = new google.maps.Marker({
+                  position: results[i].location,
+                  map: covertMap.map,
+                  title: 'Medium',
+                  icon: 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+                });
+                let infowindow = new google.maps.InfoWindow({
+                  content: 'High'
+                });
+
+                //alert('Medium');
+                checkCtr += 1;
+              } else if ( alt >= (SAMAlt - LOW) && alt <= (SAMAlt + LOW) ) {
+                let marker = new google.maps.Marker({
+                  position: results[i].location,
+                  map: covertMap.map,
+                  title: 'Low',
+                  icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+                });
+                let infowindow = new google.maps.InfoWindow({
+                  content: 'High'
+                });
+
+                //alert('Low');
+                checkCtr += 1;
+              }
+
+            }
+
+            if (checkCtr == 0) {
+              alert('Sorry, we could not locate any potential SAM sites in your area, please choose another area, or expand your search radius');
+            }
+            
+          } else {
+            
+          }
+        } else {
+          console.log('Elevation service error with status: ' + status);
+        }
+      });
+
+
+
+       }
+
+
+
+  }
+
+
+
   return {
     run: run
   };
