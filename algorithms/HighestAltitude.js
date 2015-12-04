@@ -9,8 +9,8 @@ covertMap.algorithms.HighestAltitude = function () {
           sw = bounds.getSouthWest(),
           se = new google.maps.LatLng(sw.lat(), ne.lng()),
           coords = [],
-          hSteps = Math.abs(sw.lng() - se.lng()) / 10,
-          vSteps = Math.abs(ne.lat() - se.lat()) / 10,
+          hSteps = Math.abs(sw.lng() - se.lng()) / 18,
+          vSteps = Math.abs(ne.lat() - se.lat()) / 18,
           highest,
           highestPoint = 0,
           elevator = new google.maps.ElevationService();
