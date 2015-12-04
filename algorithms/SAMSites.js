@@ -1,11 +1,6 @@
 'use strict';
 
 covertMap.algorithms.SAMSites = function () {
-  var mapMarkers = { markers: [] };
-  const CURR_SAM_LAYER = "Current SAM Layer";
-  const LOW_SAM_LAYER = "Low Probabilty SAM Layer";
-  const MED_SAM_LAYER = "Medium Probability SAM Layer";
-  const HIGH_SAM_LAYER = "High Probability SAM Layer";
 
   function run() {    
     // (a) Add current SAMs
@@ -205,9 +200,13 @@ covertMap.algorithms.SAMSites = function () {
       })(marker, i));
 
       // Add marker to JSON object
-      let markerObj = { marker: marker, layer: CURR_SAM_LAYER };
-      mapMarkers.markers.push(markerObj);
+      let markerObj = { marker: marker, layer: covertMap.CURR_SAM_LAYER };
+      covertMap.mapMarkers.markers.push(markerObj);
     }
+
+    // Show that markers are on
+    $('.toggle-button').eq(0).addClass('list-group-item-success');
+
   }
 
   /// -----------------------------------------------------
@@ -217,6 +216,11 @@ covertMap.algorithms.SAMSites = function () {
     let HIGH = 10,
        MED = 50,
        LOW = 100;
+
+       // Make toggle button green
+      $('.toggle-button').eq(1).addClass('list-group-item-success');
+      $('.toggle-button').eq(2).addClass('list-group-item-success');
+      $('.toggle-button').eq(3).addClass('list-group-item-success');
 
        if (covertMap.circle) {
         let bounds = covertMap.circle.getBounds(),
@@ -261,8 +265,8 @@ covertMap.algorithms.SAMSites = function () {
                 checkCtr += 1;
 
                 // Add marker to JSON Object
-                let markerObj = { marker: marker, layer: HIGH_SAM_LAYER };
-                mapMarkers.markers.push(markerObj);
+                let markerObj = { marker: marker, layer: covertMap.HIGH_SAM_LAYER };
+                covertMap.mapMarkers.markers.push(markerObj);
 
               } else if ( alt >= (SAMAlt - MED) && alt <= (SAMAlt + MED) ) {
                 let marker = new google.maps.Marker({
@@ -279,8 +283,8 @@ covertMap.algorithms.SAMSites = function () {
                 checkCtr += 1;
 
                 // Add marker to JSON Object
-                let markerObj = { marker: marker, layer: MED_SAM_LAYER };
-                mapMarkers.markers.push(markerObj);
+                let markerObj = { marker: marker, layer: covertMap.MED_SAM_LAYER };
+                covertMap.mapMarkers.markers.push(markerObj);
 
               } else if ( alt >= (SAMAlt - LOW) && alt <= (SAMAlt + LOW) ) {
                 let marker = new google.maps.Marker({
@@ -297,8 +301,8 @@ covertMap.algorithms.SAMSites = function () {
                 checkCtr += 1;
 
                 // Add marker to JSON Object
-                let markerObj = { marker: marker, layer: LOW_SAM_LAYER };
-                mapMarkers.markers.push(markerObj);
+                let markerObj = { marker: marker, layer: covertMap.LOW_SAM_LAYER };
+                covertMap.mapMarkers.markers.push(markerObj);
 
               }
 

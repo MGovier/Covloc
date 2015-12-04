@@ -12,6 +12,11 @@
 var covertMap = covertMap || {};
 
 covertMap.functions = function() {
+covertMap.mapMarkers = { markers: [] };
+covertMap.CURR_SAM_LAYER = "Current SAM Layer";
+covertMap.LOW_SAM_LAYER = "Low Probabilty SAM Layer";
+covertMap.MED_SAM_LAYER = "Medium Probability SAM Layer";
+covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
 
   function pageLoaded() {
     $('.location-search').submit(enterSearch);
@@ -177,23 +182,29 @@ covertMap.functions = function() {
     //alert(index);
     if (index > 0) {
       if (index === 1) {
-        // If markers are currently on the map
-        if ( $('.toggle-button').eq( index - 1).hasClass('list-group-item-success') ) {
-          
-          // [MG] need to access map markers object here
-           
+        // Toggle known SAM sites OFF
+        if ( $('.toggle-button').eq( index - 1).hasClass('list-group-item-success') ) { setMarkerVisibility(covertMap.CURR_SAM_LAYER, false); } 
+        // Toggle known SAM sites ON
+        else { setMarkerVisibility(covertMap.CURR_SAM_LAYER, true); }
 
-        } else {
-
-        }
-        
-
-      } else if (index === 2) {
-
-      } else if (index === 3) {
-
-      } else {
-
+      } 
+      else if (index === 2) {
+        // Toggle High Probability SAM sites OFF
+        if ( $('.toggle-button').eq( index - 1).hasClass('list-group-item-success') ) { setMarkerVisibility(covertMap.HIGH_SAM_LAYER, false); } 
+        // Toggle High Probability SAM sites OFF
+        else { setMarkerVisibility(covertMap.HIGH_SAM_LAYER, true); }
+      } 
+      else if (index === 3) {
+        // Toggle Medium Probability SAM sites OFF
+        if ( $('.toggle-button').eq( index - 1).hasClass('list-group-item-success') ) { setMarkerVisibility(covertMap.MED_SAM_LAYER, false); } 
+        // Toggle Medium Probability SAM sites OFF
+        else { setMarkerVisibility(covertMap.MED_SAM_LAYER, true); }
+      } 
+      else {
+        // Toggle Low Probability SAM sites OFF
+        if ( $('.toggle-button').eq( index - 1).hasClass('list-group-item-success') ) { setMarkerVisibility(covertMap.LOW_SAM_LAYER, false); } 
+        // Toggle Low Probability SAM sites OFF
+        else { setMarkerVisibility(covertMap.LOW_SAM_LAYER, true); }
       }
 
       // Toggle the class for visual aid
@@ -205,6 +216,19 @@ covertMap.functions = function() {
     // if on, hide markers
     // if off, show markers
 
+  }
+
+  function setMarkerVisibility(layerName, setVisible) {
+
+    for (var i = 0;i < covertMap.mapMarkers.markers.length;i++) {
+      var markerObj = covertMap.mapMarkers.markers[i];
+
+      if (markerObj.layer == layerName) { 
+        // Set to map or null, based on setVisible parameter
+        let map = setVisible ? covertMap.map : null;
+        markerObj.marker.setMap(map); 
+      }
+    } 
   }
 
 
