@@ -50,11 +50,6 @@ covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
       mapTypeId: 'hybrid'
     });
 
-    google.maps.event.addListener(covertMap.map, 'zoom_changed', function() {
-      let minZoomLevel = 13;
-      if (covertMap.map.getZoom() < minZoomLevel) covertMap.map.setZoom(minZoomLevel);
-   });
-
   };
 
 
