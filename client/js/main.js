@@ -12,11 +12,43 @@
 var covertMap = covertMap || {};
 
 covertMap.functions = function() {
-covertMap.mapMarkers = { markers: [] };
-covertMap.CURR_SAM_LAYER = "Current SAM Layer";
-covertMap.LOW_SAM_LAYER = "Low Probabilty SAM Layer";
-covertMap.MED_SAM_LAYER = "Medium Probability SAM Layer";
-covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
+  covertMap.mapMarkers = { markers: [] };
+  covertMap.CURR_SAM_LAYER = "Current SAM Layer";
+  covertMap.LOW_SAM_LAYER = "Low Probabilty SAM Layer";
+  covertMap.MED_SAM_LAYER = "Medium Probability SAM Layer";
+  covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
+
+  const API_URL = '/api/1/algorithms';
+
+  function getAlgorithms() {
+    $.get(API_URL)
+      .done((data) => {
+        buildMenu(data);
+      })
+      .fail((err) => {
+        alert('Algorithm API failed due to: ' + err);
+      });
+  }
+
+
+  function buildMenu (algorithmData) {
+    covertMap.algorithms = {};
+    for (let algo in algorithmData) {
+      // Don't use prototype...
+      if (algorithmData.hasOwnProperty(algo)) {
+        let obj = algorithmData[algo];
+        $('.algo-menu').append('<li id="' + obj.name + '"><a href="#">' + obj.description + '</a></li>');
+        $.getScript(obj.file);
+      }
+    }
+  }
+
+
+  function runAlgo(evt) {
+    clearState();
+    $(evt.currentTarget).addClass('active');
+    covertMap.algorithms[evt.currentTarget.id].run();
+  }
 
   function pageLoaded() {
     $('.location-search').submit(enterSearch);
@@ -25,6 +57,7 @@ covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
     $('.left-menu').hide();
     $('#pick-location').addClass('active');
     $('#pick-location').click(function() {
+      // Simplest way to reset the map for now:
       location.reload();
     });
     $('.radiusDropdown > li').click(updateChosenRadius);
@@ -39,7 +72,7 @@ covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
     evt.preventDefault();
     let searchTerm = evt.currentTarget[0].value;
     findLocation(searchTerm);
-    covertMap.map.setZoom(13);
+    covertMap.map.setZoom(11);
   };
 
 
@@ -81,13 +114,13 @@ covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
         fillColor: '#FF0000',
         map: covertMap.map,
         center: searchCenter,
-        radius: 1000,
+        radius: 5000,
         geodesic: true,
         draggable: true
       }); 
 
       // Place default radius in input box (1000m)
-      document.getElementById('searchRadius').value = 1000;
+      document.getElementById('searchRadius').value = 5000;
 
       // Set map to chosen location
       covertMap.map.setCenter(searchCenter);
@@ -262,38 +295,6 @@ covertMap.HIGH_SAM_LAYER = "High Probability SAM Layer";
       });
     }
   }
-
-
-  function getAlgorithms() {
-    $.get('http://localhost:8080/api/1/algorithms')
-      .done((data) => {
-        buildMenu(data);
-      })
-      .fail((err) => {
-        alert('Algorithm API failed due to: ' + err);
-      });
-  }
-
-
-  function buildMenu (algorithmData) {
-    covertMap.algorithms = {};
-    for (let algo in algorithmData) {
-      // Don't use prototype...
-      if (algorithmData.hasOwnProperty(algo)) {
-        let obj = algorithmData[algo];
-        $('.algo-menu').append('<li id="' + obj.name + '"><a href="#">' + obj.description + '</a></li>');
-        $.getScript(obj.file);
-      }
-    }
-  }
-
-
-  function runAlgo(evt) {
-    clearState();
-    $(evt.currentTarget).addClass('active');
-    covertMap.algorithms[evt.currentTarget.id].run();
-  }
-
 
   return {
       pageLoaded: pageLoaded,

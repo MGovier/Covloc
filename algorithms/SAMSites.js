@@ -68,17 +68,17 @@ covertMap.algorithms.SAMSites = function () {
   function getClosestSAMAltitude(centre) {
 
     // Find closest SAM
-    let closestSAM = { id: "", latLng: 0 };
-    var highestDistance;
+    let closestSAM = { id: "", latLng: 0 },
+        closestDistance;
 
-    for (let i = 0;i < locations.length;i++) {
-      let samLoc = new google.maps.LatLng(locations[i][1], locations[i][2]);
-      var distance = google.maps.geometry.spherical.computeDistanceBetween(centre, samLoc);
-      
-      if (i === 0 || distance < highestDistance) { 
+    for (let i = 0; i < locations.length; i++) {
+      let samLoc = new google.maps.LatLng(locations[i][1], locations[i][2]),
+          distance = google.maps.geometry.spherical.computeDistanceBetween(centre, samLoc);
+
+      if (i === 0 || distance < closestDistance) { 
         closestSAM.id = i; 
         closestSAM.latLng = samLoc; 
-        highestDistance = distance;
+        closestDistance = distance;
       }
     }
 
@@ -178,7 +178,15 @@ covertMap.algorithms.SAMSites = function () {
     ['russia',  55.083341496, 21.8722428987 , 42],
     ['russia',  54.8717553817, 19.9538143131 , 43],
     ['russia',  54.4808053926, 19.91432  , 44],
-    ['russia',  54.7478248936, 19.9706574888  , 45]
+    ['russia',  54.7478248936, 19.9706574888  , 45],
+    ['EW site',  32.7743251125, 151.821039727 , 46],
+    ['Woomera Test Range',  -30.9419180416, 136.538975611, 47],
+    ['Jindalee OTH-R', -24.2984600431, 143.201775725, 48],
+    ['Jindalee OTH-T', -23.6613755619, 144.14610977,49],
+    ['Jindalee OTH-R', -23.519732592, 133.692058856,50],
+    ['Jindalee OTH-T', -28.3109465031, 122.850124546,51],
+    ['Jindalee OTH-R', -28.3392386109, 122.003697399,52],
+    ['EW site',  -11.7584641354, 130.034393209  ,53]
     ];
 
     // Could get locations dynamically, e.g. assign values to 'locations'
@@ -215,14 +223,13 @@ covertMap.algorithms.SAMSites = function () {
   /// Places markers on Map to identify potential SAM sites
   /// -----------------------------------------------------
   function listSAMSiteProbability(SAMAlt) {
-    let HIGH = 10,
-       MED = 50,
-       LOW = 100;
+    let HIGH = 1,
+       MED = 4,
+       LOW = 10;
 
        // Make toggle button green
       $('.toggle-button').eq(1).addClass('list-group-item-success');
       $('.toggle-button').eq(2).addClass('list-group-item-success');
-      $('.toggle-button').eq(3).addClass('list-group-item-success');
 
        if (covertMap.circle) {
         let bounds = covertMap.circle.getBounds(),
@@ -249,8 +256,14 @@ covertMap.algorithms.SAMSites = function () {
 
           // Check there are probable SAM sites
           if (results[0]) {
+            var highest = 0,
+                highPoint;
             for (let i = 0; i < results.length; i++) {
               var alt = results[i].elevation;
+              if (alt > highest) {
+                highest = alt;
+                highPoint = results[i].location; 
+              }
 
               if ( alt >= (SAMAlt - HIGH) && alt <= (SAMAlt + HIGH) ){
                 let marker = new google.maps.Marker({
@@ -291,7 +304,7 @@ covertMap.algorithms.SAMSites = function () {
               } else if ( alt >= (SAMAlt - LOW) && alt <= (SAMAlt + LOW) ) {
                 let marker = new google.maps.Marker({
                   position: results[i].location,
-                  map: covertMap.map,
+                  map: null,
                   title: 'Low',
                   icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
                 });
@@ -309,9 +322,23 @@ covertMap.algorithms.SAMSites = function () {
               }
 
             }
+            console.log(highPoint);
+            let marker = new google.maps.Marker({
+                position: highPoint,
+                map: covertMap.map,
+                title: 'High Point',
+                icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+              });
+              let infowindow = new google.maps.InfoWindow({
+                content: 'High Point'
+              });
+
+              // Add marker to JSON Object
+              let markerObj = { marker: marker, layer: covertMap.HIGH_SAM_LAYER };
+              covertMap.mapMarkers.markers.push(markerObj);
 
             if (checkCtr == 0) {
-              alert('Sorry, we could not locate any potential SAM sites in your area, please choose another area, or expand your search radius');
+              alert('This is a challenging region, and no related SAM positions could be matched. An alternative will be marked for consideration.');
             }
             
           } else {
@@ -321,16 +348,8 @@ covertMap.algorithms.SAMSites = function () {
           console.log('Elevation service error with status: ' + status);
         }
       });
-
-
-
-       }
-
-
-
+    }
   }
-
-
 
   return {
     run: run
