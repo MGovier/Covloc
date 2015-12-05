@@ -69,14 +69,16 @@ covertMap.algorithms.SAMSites = function () {
 
     // Find closest SAM
     let closestSAM = { id: "", latLng: 0 };
+    var highestDistance;
 
     for (let i = 0;i < locations.length;i++) {
       let samLoc = new google.maps.LatLng(locations[i][1], locations[i][2]);
       var distance = google.maps.geometry.spherical.computeDistanceBetween(centre, samLoc);
-
-      if (i === 0 || distance < closestSAM.latLng) { 
+      
+      if (i === 0 || distance < highestDistance) { 
         closestSAM.id = i; 
         closestSAM.latLng = samLoc; 
+        highestDistance = distance;
       }
     }
 
@@ -85,9 +87,9 @@ covertMap.algorithms.SAMSites = function () {
       // TODO: Iterate through altitudes looking for acceptable margin.
       // Or return no suitable position.
       console.log('alt', alt);
-      let HIGH = 10,
-        MED = 50,
-        LOW = 100;
+      let HIGH = 2.5,
+        MED = 12.5,
+        LOW = 25;
       
       // TEST FOR SAM LIKELYHOOD - ** Can remove **
       //altitude = 500;
